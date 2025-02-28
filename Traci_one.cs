@@ -12,6 +12,15 @@ using CodingConnected.TraCI.NET.Commands;
 using Color = UnityEngine.Color;
 using Object = System.Object;
 
+// Add this enum definition before the class declaration
+public enum TurnDirection
+{
+    Unknown,
+    Left,
+    Straight,
+    Right
+}
+
 public class Traci_one : MonoBehaviour
 {
 
@@ -240,7 +249,7 @@ public class Traci_one : MonoBehaviour
                 for (int i = 0; i < controlledLinks.NumberOfSignals; i++)
                 {
                     var link = controlledLinks.Links[i];
-                    if (link.Length >= 2 && !string.IsNullOrEmpty(link[0]) && !string.IsNullOrEmpty(link[1]))
+                    if (link.Count >= 2 && !string.IsNullOrEmpty(link[0]) && !string.IsNullOrEmpty(link[1]))
                     {
                         // 获取进入车道和目标车道
                         string incomingLane = link[0];
@@ -279,8 +288,39 @@ public class Traci_one : MonoBehaviour
         try
         {
             // 获取车道的形状（坐标点序列）
-            var incomingShape = client.Lane.GetShape(incomingLane).Content;
-            var targetShape = client.Lane.GetShape(targetLane).Content;
+            var incomingShapeData = client.Lane.GetShape(incomingLane).Content;
+            var targetShapeData = client.Lane.GetShape(targetLane).Content;
+            
+            // 从TraCI.NET类型转换为List
+            List<PositionT> incomingShape = new List<PositionT>();
+            List<PositionT> targetShape = new List<PositionT>();
+            
+            // 手动添加形状点到列表中
+            if (incomingShapeData is IEnumerable<PositionT> incomingEnum)
+            {
+                incomingShape.AddRange(incomingEnum);
+            }
+            else if (incomingShapeData is Array incomingArray)
+            {
+                foreach (var point in incomingArray)
+                {
+                    if (point is PositionT pos)
+                        incomingShape.Add(pos);
+                }
+            }
+            
+            if (targetShapeData is IEnumerable<PositionT> targetEnum)
+            {
+                targetShape.AddRange(targetEnum);
+            }
+            else if (targetShapeData is Array targetArray)
+            {
+                foreach (var point in targetArray)
+                {
+                    if (point is PositionT pos)
+                        targetShape.Add(pos);
+                }
+            }
             
             if (incomingShape.Count < 2 || targetShape.Count < 2)
             {
