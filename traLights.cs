@@ -2,6 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// 添加一个枚举来表示转向类型
+public enum TurnDirection
+{
+    Left,
+    Straight,
+    Unknown
+}
+
 public class traLights
 {
     public int index;
@@ -14,13 +22,7 @@ public class traLights
     public Light y2;
     public Light g2;
     public bool isdual;
-    // 添加一个枚举来表示转向类型
-    public enum TurnDirection
-    {
-        Left,
-        Straight,
-        Unknown
-    }
+
     /*
      * The Traffic light class
      * @params lightid: junction ID
